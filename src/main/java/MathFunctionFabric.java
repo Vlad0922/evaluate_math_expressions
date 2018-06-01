@@ -13,7 +13,8 @@ public class MathFunctionFabric {
 
         String className = funcName + "Expression";
 
-        String source = "public final class " + className + " implements " + BASE_CLASS_NAME + " {\n"
+        String source = "import static java.lang.Math.*;\n" +
+                "public final class " + className + " implements " + BASE_CLASS_NAME + " {\n"
                 + "public double compute(double[] args) {\n"
                 + "\treturn " + prepared + ";}\n}\n";
 

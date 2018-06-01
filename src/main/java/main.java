@@ -15,14 +15,15 @@ import org.mariuszgromada.math.mxparser.*;
 import parsii.eval.*;
 
 import static com.udojava.evalex.Expression.e;
-
+import static java.lang.Math.*;
 
 public class main {
     public static double target_fun1(double a, double b) {
-        return Math.sqrt(a*a + b*b);
+        return sqrt(a*a + b*b);
     }
 
     public static void main(String[] args) {
+
         test_generator();
 //        test_time();
 //        generate_csv();
@@ -30,7 +31,7 @@ public class main {
 
     private static void test_generator() {
         MathExpression expr = MathFunctionFabric.generateFunction("divisionProbability",
-                "Math.exp(-Math.pow(1 - GABA, 2))",
+                "exp(-pow(1 - GABA, 2))",
                 "GABA");
 
         double[] xData = new double[100];
