@@ -16,5 +16,5 @@ dependencies {
     compile group: 'com.scireum', name: 'parsii', version: '3.1'
 // https://mvnrepository.com/artifact/org.mariuszgromada.math/MathParser.org-mXparser
     compile group: 'org.mariuszgromada.math', name: 'MathParser.org-mXparser', version: '4.0.0'
-
+    compile group: 'net.openhft', name: 'compiler', 'version': '2.3.0'
 }
