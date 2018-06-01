@@ -36,13 +36,15 @@ public class main {
         double[] xData = new double[100];
         double[] yData = new double[100];
 
-        double x = -1.;
+        double[] args = new double[1];
+
+        args[0] = -1;
 
         for(int i = 0; i < 100; ++i) {
-            xData[i] = x;
-            yData[i] = expr.compute(new double[]{x});
+            xData[i] = args[0];
+            yData[i] = expr.compute(args);
 
-            x += 0.05;
+            args[0] += 0.05;
         }
 
         XYChart chart = QuickChart.getChart("Sample Chart", "X", "Y", "y(x)", xData, yData);
