@@ -17,4 +17,10 @@ dependencies {
 // https://mvnrepository.com/artifact/org.mariuszgromada.math/MathParser.org-mXparser
     compile group: 'org.mariuszgromada.math', name: 'MathParser.org-mXparser', version: '4.0.0'
     compile group: 'net.openhft', name: 'compiler', 'version': '2.3.0'
+    // https://mvnrepository.com/artifact/org.jfree/jfreechart
+// https://mvnrepository.com/artifact/org.knowm.xchart/xchart
+    compile group: 'org.knowm.xchart', name: 'xchart', version: '3.5.2'
+    compile group: 'org.jzy3d', name: 'jzy3d-api', version: '0.9.1'
+
+
 }
