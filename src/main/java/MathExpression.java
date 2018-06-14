@@ -1,3 +1,3 @@
-public interface MathExpression {
-    double compute(double[] args);
+public interface MathExpression{
+    public double compute(double[] args);
 }

@@ -24,7 +24,8 @@ public class main {
 
     public static void main(String[] args) {
 
-        test_generator();
+//        test_generator();
+        test_logical();
 //        test_time();
 //        generate_csv();
     }
@@ -34,14 +35,14 @@ public class main {
                 "exp(-pow(1 - GABA, 2))",
                 "GABA");
 
-        double[] xData = new double[100];
-        double[] yData = new double[100];
+        double[] xData = new double[120];
+        double[] yData = new double[120];
 
         double[] args = new double[1];
 
-        args[0] = -1;
+        args[0] = -2;
 
-        for(int i = 0; i < 100; ++i) {
+        for(int i = 0; i < 120; ++i) {
             xData[i] = args[0];
             yData[i] = expr.compute(args);
 
@@ -54,8 +55,34 @@ public class main {
         new SwingWrapper(chart).displayChart();
     }
 
+    private static void test_logical() {
+        LogicalExpression expr = LogicalFunctionFabric.generateFunction("canDivide",
+                "(GABA > 0.2) AND (GABA < 0.9)",
+                "GABA");
+
+        double[] xData = new double[100];
+        double[] yData = new double[100];
+
+        double[] args = new double[1];
+
+        args[0] = 0;
+
+        for(int i = 0; i < 100; ++i) {
+            xData[i] = args[0];
+            yData[i] = expr.compute(args) ? 1. : 0.;
+
+            args[0] += 0.01;
+        }
+
+        XYChart chart = QuickChart.getChart("Sample Chart", "X", "Y", "y(x)", xData, yData);
+
+        // Show it
+        new SwingWrapper(chart).displayChart();
+    }
+
+
     private static void test_time() {
-        final int RUN_NUMBER = 10000000;
+        final int RUN_NUMBER = 1000;
 
         com.udojava.evalex.Expression expr_evalex = new com.udojava.evalex.Expression("SQRT(a^2 + b^2)");
 
