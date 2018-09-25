@@ -2,6 +2,7 @@
 import java.util.HashMap;
 import java.util.function.Function;
 
+
 public class DistributionFabric {
     final static HashMap<String, Function<double[], GenericDistribution>> classMap = createDistroMap();
 
@@ -22,7 +23,10 @@ public class DistributionFabric {
     private static HashMap<String, Function<double[], GenericDistribution>> createDistroMap() {
         HashMap<String, Function<double[], GenericDistribution>> res = new HashMap<>();
 
-        res.put("Gaussian", (args) -> new Gaussian(args[0], args[1]));
+        res.put("Gaussian", Gaussian::new);
+        res.put("Exponential", Exponential::new);
+        res.put("Poisson", Poisson::new);
+        res.put("Binomial", Binomial::new);
 
         return res;
     }

@@ -1,6 +1,10 @@
+import javafx.util.Pair;
 import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XYChart;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class main {
 
@@ -12,34 +16,53 @@ public class main {
     }
 
     private static void test_distributions() {
-        GenericDistribution standardGaussian = DistributionFabric.generateDistribution("Gaussian", new double[]{0., 1.});
 
-        double[] xData = new double[120];
-        double[] pdfData = new double[120];
-        double[] cdfData = new double[120];
 
         double[] args = new double[1];
 
-        args[0] = -3;
+        List<Pair<String, GenericDistribution>> distroList = new ArrayList<>();
+        distroList.add(new Pair<>("Gaussian", DistributionFabric.generateDistribution("Gaussian", new double[]{3., 1.})));
+        distroList.add(new Pair<>("Exponential", DistributionFabric.generateDistribution("Exponential", new double[]{1.5})));
+        distroList.add(new Pair<>("Poisson", DistributionFabric.generateDistribution("Poisson", new double[]{0.5})));
+        distroList.add(new Pair<>("Binomial", DistributionFabric.generateDistribution("Binomial", new double[]{3., 0.25})));
 
-        for(int i = 0; i < 120; ++i) {
-            xData[i] = args[0];
-            pdfData[i] = standardGaussian.pdf(args);
-            cdfData[i] = standardGaussian.cdf(args);
 
-            args[0] += 0.05;
+        // data is saved as reference
+        // so I have to instanitiate array for each of the distributions
+        double[][] xData = new double[distroList.size()][];
+        double[][] pdfData = new double[distroList.size()][];
+        double[][] cdfData = new double[distroList.size()][];
+
+        for(int i = 0; i < distroList.size(); ++i) {
+            xData[i] = new double[120];
+            pdfData[i] = new double[120];
+            cdfData[i] = new double[120];
         }
 
 
-        XYChart chartPDF = QuickChart.getChart("Sample Chart", "X", "Prob", "PDF", xData, pdfData);
+        for(int i = 0; i < distroList.size(); ++i) {
+            String name = distroList.get(i).getKey();
+            GenericDistribution d = distroList.get(i).getValue();
 
-        // Show it
-        new SwingWrapper(chartPDF).displayChart();
+            args[0] = 0;
 
-        XYChart chartCDF = QuickChart.getChart("Sample Chart", "X", "Prob", "CDF", xData, cdfData);
+            for (int j = 0; j < 120; ++j) {
+                xData[i][j] = args[0];
+                pdfData[i][j] = d.pdf(args);
+                cdfData[i][j] = d.cdf(args);
 
-        // Show it
-        new SwingWrapper(chartCDF).displayChart();
+                args[0] += 0.05;
+            }
+
+            List<XYChart> chartList = new ArrayList<>();
+            chartList.add(QuickChart.getChart("Sample Chart", "X", "Prob", "PDF", xData[i], pdfData[i]));
+            chartList.add(QuickChart.getChart("Sample Chart", "X", "Prob", "CDF", xData[i], cdfData[i]));
+
+            // Show it
+            new SwingWrapper(chartList).displayChartMatrix(name);
+        }
+
+
     }
 
     private static void test_generator() {
