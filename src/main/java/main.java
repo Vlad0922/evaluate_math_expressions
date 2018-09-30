@@ -65,6 +65,7 @@ public class main {
             double[] cellCounter = new double[ticksTotal];
             double[] concentrations = new double[ticksTotal];
             double[] ticksData = new double[ticksTotal];
+            double[] cellDivProbs = new double[ticksTotal];
 
             int totalDivisions = 0;
 
@@ -78,16 +79,29 @@ public class main {
                 divisionData[i] = doDivision;
                 cellCounter[i] = totalDivisions;
                 concentrations[i] = currConcentration;
+                cellDivProbs[i] = spikeProb;
                 ticksData[i] = i;
 
                 currConcentration += (Math.random() - 0.5)/10;
                 currConcentration = clamp(currConcentration, 0, 1);
             }
 
+
+            double[] xVals = new double[100];
+            double[] probVals = new double[100];
+
+            for(int i = 0; i < 100; ++i) {
+                args[0] = 1.0*i/100;
+                xVals[i] = 1.0*i/100;
+                probVals[i] = d.eventProbability(args);
+            }
+
             List<XYChart> chartList = new ArrayList<>();
-            chartList.add(QuickChart.getChart("Sample Chart", "X", "Cell count", "PDF", ticksData, cellCounter));
-            chartList.add(QuickChart.getChart("Sample Chart", "X", "Division event", "CDF", ticksData, divisionData));
-            chartList.add(QuickChart.getChart("Sample Chart", "X", "Concentration", "CDF", ticksData, concentrations));
+            chartList.add(QuickChart.getChart("Concentration chart", "X", "Concentration", "CDF", ticksData, concentrations));
+            chartList.add(QuickChart.getChart("Division probability chart", "X", "Division probability", "CDF", ticksData, cellDivProbs));
+            chartList.add(QuickChart.getChart("Division event chart", "X", "Division event", "CDF", ticksData, divisionData));
+            chartList.add(QuickChart.getChart("Cell count chart", "X", "Cell count", "PDF", ticksData, cellCounter));
+            chartList.add(QuickChart.getChart("Division probability", "X", "Probability", "CDF", xVals, probVals));
 
             // Show it
             new SwingWrapper(chartList).displayChartMatrix();
@@ -185,6 +199,7 @@ public class main {
 
             args[0] += 0.01;
         }
+
 
         XYChart chart = QuickChart.getChart("Sample Chart", "X", "Y", "y(x)", xData, yData);
 
