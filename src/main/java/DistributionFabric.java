@@ -27,6 +27,7 @@ public class DistributionFabric {
         res.put("Exponential", Exponential::new);
         res.put("Poisson", Poisson::new);
         res.put("Binomial", Binomial::new);
+        res.put("Pascal", Pascal::new);
 
         return res;
     }

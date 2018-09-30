@@ -8,20 +8,97 @@ import java.util.List;
 
 public class main {
 
+    private static double clamp(double x, double l, double r) {
+        return Math.max(l, Math.min(x, r));
+    }
+
     public static void main(String[] args) {
 
 //        test_generator();
 //        test_logical();
-        test_distributions();
+//        test_distributions();
+        simulateExperiment();
+    }
+
+    private static void simulateExperiment() {
+        boolean simulateSpiking = false;
+        boolean simulateDivision = true;
+
+        if(simulateSpiking) {
+            GenericDistribution d = DistributionFabric.generateDistribution("Pascal", new double[]{10, 0.5});
+
+            int ticksTotal = 1000;
+
+            int spikeCounter = 0;
+            double[] args = new double[1];
+            double[] spikeData = new double[ticksTotal];
+            double[] ticksData = new double[ticksTotal];
+
+            for(int i = 0; i < ticksTotal; ++i) {
+                args[0] = spikeCounter;
+                double spikeProb = d.cdf(args);
+                if(spikeProb >= Math.random()) {
+                    spikeData[i] = 1;
+                    spikeCounter = 0;
+                }
+                else
+                {
+                    spikeData[i] = 0;
+                    spikeCounter += 1;
+                }
+                args[0] = spikeCounter;
+                ticksData[i] = i;
+            }
+
+            XYChart chart = QuickChart.getChart("Sample Chart", "X", "Prob", "CDF", ticksData, spikeData);
+            new SwingWrapper(chart).displayChart("Spiking plot");
+        }
+
+        if(simulateDivision) {
+            GenericDistribution d = DistributionFabric.generateDistribution("Gaussian", new double[]{0.6, 0.1});
+
+            int ticksTotal = 1000;
+
+            double currConcentration = 0.4;
+            double[] args = new double[1];
+            double[] divisionData = new double[ticksTotal];
+            double[] cellCounter = new double[ticksTotal];
+            double[] concentrations = new double[ticksTotal];
+            double[] ticksData = new double[ticksTotal];
+
+            int totalDivisions = 0;
+
+            for(int i = 0; i < ticksTotal; ++i) {
+                args[0] = currConcentration;
+                double spikeProb = d.eventProbability(args);
+
+                int doDivision = spikeProb >= Math.random() ? 1 : 0;
+
+                totalDivisions += doDivision;
+                divisionData[i] = doDivision;
+                cellCounter[i] = totalDivisions;
+                concentrations[i] = currConcentration;
+                ticksData[i] = i;
+
+                currConcentration += (Math.random() - 0.5)/10;
+                currConcentration = clamp(currConcentration, 0, 1);
+            }
+
+            List<XYChart> chartList = new ArrayList<>();
+            chartList.add(QuickChart.getChart("Sample Chart", "X", "Cell count", "PDF", ticksData, cellCounter));
+            chartList.add(QuickChart.getChart("Sample Chart", "X", "Division event", "CDF", ticksData, divisionData));
+            chartList.add(QuickChart.getChart("Sample Chart", "X", "Concentration", "CDF", ticksData, concentrations));
+
+            // Show it
+            new SwingWrapper(chartList).displayChartMatrix();
+        }
     }
 
     private static void test_distributions() {
-
-
         double[] args = new double[1];
 
         List<Pair<String, GenericDistribution>> distroList = new ArrayList<>();
-        distroList.add(new Pair<>("Gaussian", DistributionFabric.generateDistribution("Gaussian", new double[]{3., 1.})));
+        distroList.add(new Pair<>("Gaussian", DistributionFabric.generateDistribution("Gaussian", new double[]{0.6, 0.1})));
         distroList.add(new Pair<>("Exponential", DistributionFabric.generateDistribution("Exponential", new double[]{1.5})));
         distroList.add(new Pair<>("Poisson", DistributionFabric.generateDistribution("Poisson", new double[]{0.5})));
         distroList.add(new Pair<>("Binomial", DistributionFabric.generateDistribution("Binomial", new double[]{3., 0.25})));

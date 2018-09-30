@@ -15,4 +15,6 @@ public class Poisson implements GenericDistribution {
     public double cdf(double[] args) {
         return d.cumulativeProbability((int)args[0]);
     }
+
+    public double eventProbability(double[] args) { return pdf(args); }
 }

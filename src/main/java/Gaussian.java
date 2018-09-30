@@ -15,4 +15,6 @@ public class Gaussian implements GenericDistribution {
     public double cdf(double[] args) {
         return d.cumulativeProbability(args[0]);
     }
+
+    public double eventProbability(double[] args) { return pdf(args)/d.density(d.getMean()); }
 }
