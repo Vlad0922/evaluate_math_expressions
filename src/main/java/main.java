@@ -2,8 +2,16 @@ import javafx.util.Pair;
 import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XYChart;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class main {
@@ -17,10 +25,34 @@ public class main {
 //        test_generator();
 //        test_logical();
 //        test_distributions();
-        simulateExperiment();
+        simulate_experiment();
     }
 
-    private static void simulateExperiment() {
+    public static GenericDistribution read_config(String fname) {
+        File file = new File(fname);
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        try
+        {
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document doc = documentBuilder.parse(file);
+
+            doc.getDocumentElement().normalize();
+
+            Element e = (Element)doc.getElementsByTagName("event").item(0);
+
+            String distroType = e.getAttribute("family");
+            double[] params = Arrays.stream(e.getAttribute("parameters").split(",")).mapToDouble(Double::parseDouble).toArray();
+
+            return DistributionFabric.generateDistribution(distroType, params);
+        }
+        catch(Exception e)
+        {
+            return null;
+        }
+
+    }
+
+    private static void simulate_experiment() {
         boolean simulateSpiking = false;
         boolean simulateDivision = true;
 
@@ -55,7 +87,7 @@ public class main {
         }
 
         if(simulateDivision) {
-            GenericDistribution d = DistributionFabric.generateDistribution("Gaussian", new double[]{0.6, 0.1});
+            GenericDistribution d = read_config("config.txt");
 
             int ticksTotal = 1000;
 

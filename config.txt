@@ -1,0 +1,1 @@
+<event name="divideProbability" family="Gaussian" variable="GABA" parameters="0.6,0.1" />
