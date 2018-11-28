@@ -3,16 +3,19 @@ import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XYChart;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
+
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class main {
 
@@ -52,9 +55,18 @@ public class main {
 
     }
 
+    private static int countFiles(String pattern) {
+        File dir = new File(".");
+        FileFilter fileFilter = new WildcardFileFilter(pattern);
+        File[] files = dir.listFiles(fileFilter);
+
+        return files == null ? 0 : files.length;
+    }
+
     private static void simulate_experiment() {
         boolean simulateSpiking = false;
         boolean simulateDivision = true;
+        Random globalRandom = new Random(42);
 
         if(simulateSpiking) {
             GenericDistribution d = DistributionFabric.generateDistribution("Pascal", new double[]{10, 0.5});
@@ -69,7 +81,7 @@ public class main {
             for(int i = 0; i < ticksTotal; ++i) {
                 args[0] = spikeCounter;
                 double spikeProb = d.cdf(args);
-                if(spikeProb >= Math.random()) {
+                if(spikeProb >= globalRandom.nextDouble()) {
                     spikeData[i] = 1;
                     spikeCounter = 0;
                 }
@@ -87,6 +99,8 @@ public class main {
         }
 
         if(simulateDivision) {
+            final String csvHeader = "Tick,Concentration,DivisionProbability,IsDivided,CellCount\n";
+            String csvData = csvHeader;
             GenericDistribution d = read_config("config.txt");
 
             int ticksTotal = 1000;
@@ -105,7 +119,7 @@ public class main {
                 args[0] = currConcentration;
                 double spikeProb = d.eventProbability(args);
 
-                int doDivision = spikeProb >= Math.random() ? 1 : 0;
+                int doDivision = spikeProb >= globalRandom.nextDouble() ? 1 : 0;
 
                 totalDivisions += doDivision;
                 divisionData[i] = doDivision;
@@ -114,10 +128,12 @@ public class main {
                 cellDivProbs[i] = spikeProb;
                 ticksData[i] = i;
 
-                currConcentration += (Math.random() - 0.5)/10;
+                currConcentration += (globalRandom.nextDouble() - 0.5)/10;
                 currConcentration = clamp(currConcentration, 0, 1);
-            }
 
+                String currentData = String.format("%d,%.3f,%.3f,%d,%d\n", i, currConcentration, spikeProb, doDivision, totalDivisions);
+                csvData += currentData;
+            }
 
             double[] xVals = new double[100];
             double[] probVals = new double[100];
@@ -137,6 +153,17 @@ public class main {
 
             // Show it
             new SwingWrapper(chartList).displayChartMatrix();
+
+            int experimentsDone = countFiles("experiment_division*.csv");
+            String outFname = String.format("experiment_division_%d.csv", experimentsDone);
+
+            try (PrintWriter out = new PrintWriter(outFname)) {
+                out.println(csvData);
+            }
+            catch(Exception e)
+            {
+                System.out.println(String.format("Cannot write to file %s", outFname));
+            }
         }
     }
 
